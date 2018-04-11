@@ -93,13 +93,26 @@ namespace TheAionProject
         public TravelerAction GetActionMenuChoice(Menu menu)
         {
             TravelerAction choosenAction = TravelerAction.None;
+            Console.CursorVisible = false;
 
             //
-            // TODO validate menu choices
+            // create an array of valid keys from menu dictionary
             //
-            ConsoleKeyInfo keyPressedInfo = Console.ReadKey();
-            char keyPressed = keyPressedInfo.KeyChar;
+            char[] validKeys = menu.MenuChoices.Keys.ToArray();
+
+            //
+            // validate key pressed as in MenuChoices dictionary
+            //
+            char keyPressed;
+            do
+            {
+                ConsoleKeyInfo keyPressedInfo = Console.ReadKey(true);
+                keyPressed = keyPressedInfo.KeyChar;
+            } while (!validKeys.Contains(keyPressed));
+
+
             choosenAction = menu.MenuChoices[keyPressed];
+            Console.CursorVisible = true;
 
             return choosenAction;
         }
