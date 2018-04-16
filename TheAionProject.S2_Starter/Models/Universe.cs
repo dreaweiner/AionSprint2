@@ -14,7 +14,16 @@ namespace TheAionProject
     {
         #region ***** define all lists to be maintained by the Universe object *****
 
+        /// <summary>
+        /// initialize the major game objects
+        /// </summary>
+        private List<SpaceTimeLocation> _spaceTimeLocations;
 
+        public List<SpaceTimeLocation> SpaceTimeLocations
+        {
+            get { return _spaceTimeLocations; }
+            set { _spaceTimeLocations = value; }
+        }
 
         #endregion
 
@@ -40,13 +49,13 @@ namespace TheAionProject
         /// </summary>
         private void IntializeUniverse()
         {
-
+            _spaceTimeLocations = UniverseObjects.SpaceTimeLocations;
         }
 
         #endregion
 
         #region ***** define methods to return game element objects and information *****
-        
+
         /// <summary>
         /// determine if the Space-Time Location Id is valid
         /// </summary>
@@ -54,8 +63,27 @@ namespace TheAionProject
         /// <returns></returns>
         public bool IsValidSpaceTimeLocationId(int spaceTimeLocationId)
         {
+            List<int> spaceTimeLocationIds = new List<int>();
 
-            return false;
+            //
+            // create a list of space-time location ids
+            //
+            foreach (SpaceTimeLocation stl in _spaceTimeLocations)
+            {
+                spaceTimeLocationIds.Add(stl.SpaceTimeLocationID);
+            }
+
+            //
+            // determine if the space-time location id is a valid id and return the result
+            //
+            if (spaceTimeLocationIds.Contains(spaceTimeLocationId))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
 
@@ -66,8 +94,16 @@ namespace TheAionProject
         /// <returns>accessible</returns>
         public bool IsAccessibleLocation(int spaceTimeLocationId)
         {
+            SpaceTimeLocation spaceTimeLocation = GetSpaceTimeLocationById(spaceTimeLocationId);
 
-            return false;
+            if (spaceTimeLocation.Accessable == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -78,6 +114,13 @@ namespace TheAionProject
         {
             int MaxId = 0;
 
+            foreach (SpaceTimeLocation spaceTimeLocation in SpaceTimeLocations)
+            {
+                if (spaceTimeLocation.SpaceTimeLocationID > MaxId)
+                {
+                    MaxId = spaceTimeLocation.SpaceTimeLocationID;
+                }
+            }
 
             return MaxId;
         }
@@ -91,6 +134,26 @@ namespace TheAionProject
         {
             SpaceTimeLocation spaceTimeLocation = null;
 
+            //
+            // run through the space-time location list and grab the correct one
+            //
+            foreach (SpaceTimeLocation location in _spaceTimeLocations)
+            {
+                if (location.SpaceTimeLocationID == Id)
+                {
+                    spaceTimeLocation = location;
+                }
+            }
+
+            //
+            // the specified ID was not found in the universe
+            // throw and exception
+            //
+            if (spaceTimeLocation == null)
+            {
+                string FeedbackMessage = $"The Space-Time Location Id {Id} does not exist in the current Universe.";
+                throw new ArgumentException(Id.ToString(), FeedbackMessage);
+            }
 
             return spaceTimeLocation;
         }

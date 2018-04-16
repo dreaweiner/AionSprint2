@@ -15,8 +15,10 @@ namespace TheAionProject
 
         private ConsoleView _gameConsoleView;
         private Traveler _gameTraveler;
+        private Universe _gameUniverse;
         private bool _playingGame;
-
+        private SpaceTimeLocation _currentLocation;
+        
         #endregion
 
         #region PROPERTIES
@@ -49,7 +51,8 @@ namespace TheAionProject
         private void InitializeGame()
         {
             _gameTraveler = new Traveler();
-            _gameConsoleView = new ConsoleView(_gameTraveler);
+            _gameUniverse = new Universe();
+            _gameConsoleView = new ConsoleView(_gameTraveler, _gameUniverse);
             _playingGame = true;
 
             Console.CursorVisible = false;
@@ -89,6 +92,7 @@ namespace TheAionProject
             //
             // prepare game play screen
             //
+            _currentLocation = _gameUniverse.GetSpaceTimeLocationById(_gameTraveler.SpaceTimeLocationID);
             _gameConsoleView.DisplayGamePlayScreen("Current Location", Text.CurrrentLocationInfo(), ActionMenu.MainMenu, "");
 
             //
@@ -96,6 +100,11 @@ namespace TheAionProject
             //
             while (_playingGame)
             {
+                //
+                // process all flags, events, and stats
+                //
+                UpdateGameStatus();
+                
                 //
                 // get next game action from player
                 //
@@ -111,6 +120,31 @@ namespace TheAionProject
 
                     case TravelerAction.TravelerInfo:
                         _gameConsoleView.DisplayTravelerInfo();
+                        break;
+
+                    case TravelerAction.LookAround:
+                        _gameConsoleView.DisplayLookAround();
+                        break;
+
+                    case TravelerAction.ListSpaceTimeLocations:
+                        _gameConsoleView.DisplayListOfSpaceTimeLocations();
+                        break;
+
+                    case TravelerAction.Travel:
+                        //
+                        // get new location choice and updae the current location property
+                        //
+                        _gameTraveler.SpaceTimeLocationID = _gameConsoleView.DisplayGetNextSpaceTimeLocation();
+                        _currentLocation = _gameUniverse.GetSpaceTimeLocationById(_gameTraveler.SpaceTimeLocationID);
+
+                        //
+                        // set the game play screen to the current location info format
+                        //
+                        _gameConsoleView.DisplayGamePlayScreen("Current Location", Text.CurrentLocationInfo(_currentLocation), ActionMenu.MainMenu, "");
+                        break;
+
+                    case TravelerAction.TravelerLocationsVisited:
+                        _gameConsoleView.DisplayLocationsVisited();
                         break;
 
                     case TravelerAction.Exit:
@@ -136,9 +170,29 @@ namespace TheAionProject
             Traveler traveler = _gameConsoleView.GetInitialTravelerInfo();
 
             _gameTraveler.Name = traveler.Name;
-            _gameTraveler.Age = traveler.Age;
+            _gameTraveler.Age = traveler.Age = 6;
             _gameTraveler.Race = traveler.Race;
             _gameTraveler.SpaceTimeLocationID = 1;
+
+            _gameTraveler.ExperiencePoints = 0;
+            _gameTraveler.Health = 100;
+            _gameTraveler.Lives = 3;
+        }
+
+        private void UpdateGameStatus()
+        {
+            if (!_gameTraveler.HasVisited(_currentLocation.SpaceTimeLocationID))
+            {
+                //
+                // add new location to the list of visited locations if this is a first visit
+                //
+                _gameTraveler.SpaceTimeLocationsVisited.Add(_currentLocation.SpaceTimeLocationID);
+
+                //
+                // update experience points for visiting locations
+                //
+                _gameTraveler.ExperiencePoints += +_currentLocation.ExperiencePoints;
+            }
         }
 
         #endregion

@@ -41,7 +41,7 @@ namespace TheAionProject
                     "provide excellent habitat for a rich ecosystem of flora and fauna.",
                 GeneralContents = "- stuff in the room -",
                 Accessable = true,
-                ExperiencePoints = 10
+                ExperiencePoints = -5
             },
 
             new SpaceTimeLocation
@@ -58,7 +58,7 @@ namespace TheAionProject
                 ExperiencePoints = 20
             },
 
-                        new SpaceTimeLocation
+            new SpaceTimeLocation
             {
                 CommonName = "Norlon Corporate Headquarters",
                 SpaceTimeLocationID = 4,
@@ -69,7 +69,19 @@ namespace TheAionProject
                               "with huge holdings in defense and space research and development.",
                 GeneralContents = "- stuff in the room -",
                 Accessable = true,
-                ExperiencePoints = 10
+                ExperiencePoints = -5
+            },
+
+            new SpaceTimeLocation
+            {
+                CommonName = "Murphy's Cavern",
+                SpaceTimeLocationID = 5,
+                UniversalDate = 386759,
+                UniversalLocation = "P-3, SS-278, G-2976, LS-3976",
+                Description = "This is a dive bar that has free video games for everyone.",
+                GeneralContents = "There are potions lining one wall.",
+                Accessable = true,
+                ExperiencePoints = -10
             }
         };
     }

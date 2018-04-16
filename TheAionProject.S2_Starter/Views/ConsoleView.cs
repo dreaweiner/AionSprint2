@@ -27,6 +27,7 @@ namespace TheAionProject
         // declare game objects for the ConsoleView object to use
         //
         Traveler _gameTraveler;
+        Universe _gameUniverse;
 
         ViewStatus _viewStatus;
 
@@ -41,9 +42,10 @@ namespace TheAionProject
         /// <summary>
         /// default constructor to create the console view objects
         /// </summary>
-        public ConsoleView(Traveler gameTraveler)
+        public ConsoleView(Traveler gameTraveler, Universe gameUniverse)
         {
             _gameTraveler = gameTraveler;
+            _gameUniverse = gameUniverse;
 
             _viewStatus = ViewStatus.TravelerInitialization;
 
@@ -359,6 +361,7 @@ namespace TheAionProject
                 //
                 int startingRow = ConsoleLayout.StatusBoxPositionTop + 3;
                 int row = startingRow;
+                //foreach (string statusTextLine in Text.StatusBox(_gameTraveler))
                 foreach (string statusTextLine in Text.StatusBox(_gameTraveler))
                 {
                     Console.SetCursorPosition(ConsoleLayout.StatusBoxPositionLeft + 3, row);
@@ -492,6 +495,69 @@ namespace TheAionProject
         public void DisplayTravelerInfo()
         {
             DisplayGamePlayScreen("Traveler Information", Text.TravelerInfo(_gameTraveler), ActionMenu.MainMenu, "");
+        }
+
+        public void DisplayListOfSpaceTimeLocations()
+        {
+            DisplayGamePlayScreen("List: Space-Time Locations", Text.ListSpaceTimeLocations(_gameUniverse.SpaceTimeLocations), ActionMenu.MainMenu, "");
+        }
+
+        public void DisplayLookAround()
+        {
+            SpaceTimeLocation currentSpaceTimeLocation = _gameUniverse.GetSpaceTimeLocationById(_gameTraveler.SpaceTimeLocationID);
+            DisplayGamePlayScreen("Current Location", Text.LookAround(currentSpaceTimeLocation), ActionMenu.MainMenu, "");
+        }
+
+        public int DisplayGetNextSpaceTimeLocation()
+        {
+            int spaceTimeLocationId = 0;
+            bool validSpaceTimeLocationId = false;
+
+            DisplayGamePlayScreen("Travel to a New Space-Time Location", Text.Travel(_gameTraveler, _gameUniverse.SpaceTimeLocations), ActionMenu.MainMenu, "");
+
+            while (!validSpaceTimeLocationId)
+            {
+                //
+                // get an integer from the player
+                //
+                GetInteger($"Enter your new location {_gameTraveler.Name}: ", 1, _gameUniverse.GetMaxSpaceTimeLocationId(), out spaceTimeLocationId);
+
+                //
+                // validate integer as a valid space-time location id and determine accessiblility
+                //
+                if (_gameUniverse.IsValidSpaceTimeLocationId(spaceTimeLocationId))
+                {
+                    if (_gameUniverse.IsAccessibleLocation(spaceTimeLocationId))
+                    {
+                        validSpaceTimeLocationId = true;
+                    }
+                    else
+                    {
+                        ClearInputBox();
+                        DisplayInputErrorMessage("It appears you attempting to travel to an inaccessible location. Please try again.");
+                    }
+                }
+                else
+                {
+                    DisplayInputErrorMessage("It appears you entered an invalid Space-Time location ID. Please try again.");
+                }
+            }
+
+            return spaceTimeLocationId;
+        }
+
+        public void DisplayLocationsVisited()
+        {
+            //
+            // generate a list of space time locations that have been visited
+            //
+            List<SpaceTimeLocation> visitedSpaceTimeLocations = new List<SpaceTimeLocation>();
+            foreach (int spaceTimeLocationId in _gameTraveler.SpaceTimeLocationsVisited)
+            {
+                visitedSpaceTimeLocations.Add(_gameUniverse.GetSpaceTimeLocationById(spaceTimeLocationId));
+            }
+
+            DisplayGamePlayScreen("Space-Time Locations Visited", Text.VisitedLocations(visitedSpaceTimeLocations), ActionMenu.MainMenu, "");
         }
 
         #endregion
